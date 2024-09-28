@@ -15,14 +15,14 @@ pipeline {
         }
         stage ("Git checkout") {
             steps {
-                git branch: 'main', url: 'https://github.com/Sunilmargale/Starbucks-CI-CD-project.git'
+                git branch: 'main', url: 'https://github.com/Sunilmargale/Hotstar-CI-CD-project.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-scanner') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
-                    -Dsonar.projectKey=starbucks '''
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=hotstar \
+                    -Dsonar.projectKey=hotstar '''
                 }
             }
         }
@@ -51,15 +51,15 @@ pipeline {
         }
         stage ("Build Docker Image") {
             steps {
-                sh "docker build -t starbucks ."
+                sh "docker build -t hotstar ."
             }
         }
         stage ("Tag & Push to DockerHub") {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred') {
-                        sh "docker tag starbucks sunilmargale/starbucks:latest "
-                        sh "docker push sunilmargale/starbucks:latest "
+                        sh "docker tag hotstar sunilmargale/hotstar:latest "
+                        sh "docker push sunilmargale/hotstar:latest "
                     }
                 }
             }
@@ -68,16 +68,16 @@ pipeline {
             steps {
                 script{
                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker'){
-                       sh 'docker-scout quickview sunilmargale/starbucks:latest'
-                       sh 'docker-scout cves sunilmargale/starbucks:latest'
-                       sh 'docker-scout recommendations sunilmargale/starbucks:latest'
+                       sh 'docker-scout quickview sunilmargale/hotstar:latest'
+                       sh 'docker-scout cves sunilmargale/hotstar:latest'
+                       sh 'docker-scout recommendations sunilmargale/hotstar:latest'
                    }
                 }
             }
         }
         stage ("Deploy to Conatiner") {
             steps {
-                sh 'docker run -d --name starbucks -p 4000:4000 sunilmargale/starbucks:latest'
+                sh 'docker run -d --name hotstar -p 3000:3000 sunilmargale/hotstar:latest'
             }
         }
     }
