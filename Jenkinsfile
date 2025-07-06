@@ -4,6 +4,9 @@ pipeline {
         jdk 'jdk17'
         nodejs 'node16'
     }
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
     stages {
         stage ("clean workspace") {
             steps {
@@ -14,6 +17,21 @@ pipeline {
             steps {
                 git branch: 'main', url: 'https://github.com/Sunilmargale/Hotstar-CI-CD-project.git'
             }
+        }
+        stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=hotstar \
+                    -Dsonar.projectKey=hotstar '''
+                }
+            }
+        }
+        stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-cred' 
+                }
+            } 
         }
         stage("Install NPM Dependencies") {
             steps {
