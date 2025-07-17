@@ -4,7 +4,7 @@ pipeline {
         jdk 'jdk17'
         nodejs 'node16'
     }
-    #environment {
+    environment {
         SCANNER_HOME=tool 'sonar-scanner'
     }
     stages {
@@ -18,7 +18,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Sunilmargale/Hotstar-CI-CD-project.git'
             }
         }
-        #stage("Sonarqube Analysis "){
+        stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-server') {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=hotstar \
@@ -26,7 +26,7 @@ pipeline {
                 }
             }
         }
-        #stage("quality gate"){
+        stage("quality gate"){
            steps {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'sonar-cred' 
@@ -81,7 +81,7 @@ pipeline {
             }
         }
     }
-    #post {
+    post {
     always {
         emailext attachLog: true,
             subject: "'${currentBuild.result}'",
